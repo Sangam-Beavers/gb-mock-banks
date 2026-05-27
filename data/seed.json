@@ -1,0 +1,69 @@
+{
+  "_comment": "Mock 은행 시드 데이터. npm run seed 로 SQLite(bank.db)에 투입된다. npm run reset 으로 초기화 후 재투입. 금액은 string 십진수(소수 4자리). 지원 통화 = KRW/USD/PHP/VND.",
+  "accounts": [
+    {
+      "bank_code": "SHINHAN",
+      "account_number": "110-234-567890",
+      "holder_name": "WIN MAUNG",
+      "currency_code": "KRW",
+      "balance": "5000000.0000",
+      "note": "[한국→해외] 한국 거주 사용자의 충전 재원 계좌. 여기서 출금해 주머니로 충전."
+    },
+    {
+      "bank_code": "WOORI",
+      "account_number": "1002-345-678901",
+      "holder_name": "NGUYEN VAN A",
+      "currency_code": "KRW",
+      "balance": "3200000.0000",
+      "note": "[한국→해외] 또 다른 충전 재원 계좌."
+    },
+    {
+      "bank_code": "KB",
+      "account_number": "404-21-987654",
+      "holder_name": "JUAN DELA CRUZ",
+      "currency_code": "KRW",
+      "balance": "150000.0000",
+      "note": "[한국→해외] 잔액 적은 계좌 — 충전 시 잔액부족(BANK4002) 시연용."
+    },
+    {
+      "bank_code": "QUOKKA",
+      "account_number": "VN-9001-4455",
+      "holder_name": "TRAN THI GIA DINH",
+      "currency_code": "VND",
+      "balance": "0.0000",
+      "note": "[한국→해외] 베트남 본국 가족 수취 계좌. 현금화(지급) 대상."
+    },
+    {
+      "bank_code": "QUOKKA",
+      "account_number": "PH-7700-1234",
+      "holder_name": "MARIA SANTOS",
+      "currency_code": "PHP",
+      "balance": "0.0000",
+      "note": "[한국→해외] 필리핀 본국 수취 계좌."
+    },
+    {
+      "bank_code": "QUOKKA",
+      "account_number": "US-3300-8899",
+      "holder_name": "DAVID KIM",
+      "currency_code": "USD",
+      "balance": "0.0000",
+      "note": "[한국→해외] 미국 수취 계좌."
+    },
+    {
+      "bank_code": "QUOKKA",
+      "account_number": "VN-2200-0011",
+      "holder_name": "LE VAN B",
+      "currency_code": "VND",
+      "balance": "50000000.0000",
+      "note": "[해외→한국] 베트남 사용자의 충전 재원 계좌(VND 보유). 역방향 송금 시 여기서 출금."
+    },
+    {
+      "bank_code": "BEAVER",
+      "account_number": "BV-1000-7788",
+      "holder_name": "KIM CHEOL SU",
+      "currency_code": "KRW",
+      "balance": "0.0000",
+      "note": "[해외→한국] 한국 수취 계좌. 역방향(해외→한국) 현금화(지급) 대상."
+    }
+  ]
+}

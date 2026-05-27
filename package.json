@@ -1,0 +1,20 @@
+{
+  "name": "globalbridge-mock-bank",
+  "version": "1.0.0",
+  "description": "GlobalBridge Mock 외부 은행 서버 (Beaver/Quokka). 실제 PG·오픈뱅킹·해외 파트너 은행을 시뮬레이션한다.",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "seed": "node src/seed.js",
+    "reset": "node src/seed.js --reset"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.0.0",
+    "dotenv": "^16.4.5"
+  }
+}
