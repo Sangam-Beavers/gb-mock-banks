@@ -40,6 +40,30 @@ npm start
 
 ---
 
+## 2-1. Docker로 실행 (운영용)
+
+운영 시스템이 docker-compose 기반인 경우, 컨테이너로 띄울 수 있습니다.
+호스트의 `./data/bank.db`(시드 들어있는 그 파일)와 `./certs/`를 그대로 마운트해서 사용합니다.
+
+```bash
+# 1) .env 생성 (기본값 그대로 사용 — 수정 불필요)
+cp .env.example .env
+
+# 2) 컨테이너 빌드 + 기동 (DB 없으면 entrypoint가 자동으로 시드함)
+docker compose up -d --build
+
+# 3) 헬스 체크
+curl http://localhost:4000/health
+```
+
+- 이미지: `node:20-slim` 기반 멀티스테이지 (`linux/amd64`)
+- 시드 데이터(`data/seed.json`)는 이미지에 포함 — 호스트에 별도 준비 불필요
+- 첫 기동 시 entrypoint가 `bank.db`를 자동 생성하고 시드 투입. 이후 기동부터는 기존 DB 재사용.
+- 볼륨: `./certs` → `/app/certs:ro` (mTLS 인증서). `./data` 볼륨을 마운트하면 거래 원장이 호스트에 영속화됨 (제거하면 컨테이너 재시작마다 fresh 시드).
+- mTLS 켤 때는 `.env`의 `TLS_ENABLED=true` 로만 변경 (인증서는 아래 §3 참고)
+
+---
+
 ## 3. mTLS 켜기 (데모/발표용)
 
 ```bash

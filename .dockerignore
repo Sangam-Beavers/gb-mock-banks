@@ -1,0 +1,49 @@
+# 의존성 (이미지 안에서 npm ci로 새로 설치)
+node_modules/
+npm-debug.log*
+
+# 환경 변수 (compose의 env_file로 주입)
+.env
+.env.local
+.env.*.local
+
+# 런타임 데이터 (호스트 볼륨 마운트로 주입)
+# seed.json 은 이미지에 굽고, 실제 DB 파일만 제외
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite
+data/*.sqlite3
+certs/
+
+# Git / GitHub
+.git/
+.gitignore
+.github/
+
+# 문서 (런타임 불필요)
+*.md
+
+# 에디터 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS 생성 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 빌드 산출물 / 캐시
+dist/
+build/
+coverage/
+.nyc_output/
+.cache/
+
+# Docker 자체 (빌드 컨텍스트에 불필요)
+Dockerfile
+docker-compose.yml
+.dockerignore
