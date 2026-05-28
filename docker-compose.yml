@@ -7,9 +7,6 @@ services:
     container_name: gb-mock-banks
     platform: linux/amd64
     restart: unless-stopped
-    ports:
-      - "4000:4000"
-    # .env 파일을 먼저 만들어두세요:  cp .env.example .env
     env_file:
       - .env
     volumes:

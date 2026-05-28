@@ -8,7 +8,12 @@ npm-debug.log*
 .env.*.local
 
 # 런타임 데이터 (호스트 볼륨 마운트로 주입)
-data/
+# seed.json 은 이미지에 굽고, 실제 DB 파일만 제외
+data/*.db
+data/*.db-shm
+data/*.db-wal
+data/*.sqlite
+data/*.sqlite3
 certs/
 
 # Git / GitHub
