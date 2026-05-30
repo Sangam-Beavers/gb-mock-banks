@@ -93,15 +93,15 @@ npm start          # → https://localhost:4000 (클라이언트 인증서 필�
 # 헬스 체크
 curl http://localhost:4000/health
 
-# ① 예금주 조회
+# ① 예금주 조회  (bank_code = 088 신한)
 curl -X POST http://localhost:4000/api/v1/bank/accounts/inquiry \
   -H 'Content-Type: application/json' \
-  -d '{"bank_code":"SHINHAN","account_number":"110-234-567890"}'
+  -d '{"bank_code":"088","account_number":"110234567890"}'
 
 # ② 계좌 인증 → account_token 받기
 curl -X POST http://localhost:4000/api/v1/bank/accounts/verify \
   -H 'Content-Type: application/json' \
-  -d '{"bank_code":"SHINHAN","account_number":"110-234-567890","holder_name":"WIN MAUNG"}'
+  -d '{"bank_code":"088","account_number":"110234567890","holder_name":"WIN MAUNG"}'
 
 # ③ 출금 (위에서 받은 account_token 사용) — 충전 재원
 curl -X POST http://localhost:4000/api/v1/bank/transfers/withdrawal \
@@ -109,11 +109,11 @@ curl -X POST http://localhost:4000/api/v1/bank/transfers/withdrawal \
   -H 'Idempotency-Key: 11111111-1111-1111-1111-111111111111' \
   -d '{"account_token":"<위에서_받은_토큰>","amount":"100000","currency_code":"KRW"}'
 
-# ④ 지급 — 현금화 (베트남 수취 계좌)
+# ④ 지급 — 현금화 (베트남 수취 계좌, bank_code = 901 Quokka)
 curl -X POST http://localhost:4000/api/v1/bank/transfers/payout \
   -H 'Content-Type: application/json' \
   -H 'Idempotency-Key: 22222222-2222-2222-2222-222222222222' \
-  -d '{"bank_code":"QUOKKA","account_number":"VN-9001-4455","amount":"18250000","currency_code":"VND"}'
+  -d '{"bank_code":"901","account_number":"VN90014455","amount":"18250000","currency_code":"VND"}'
 ```
 
 mTLS 켠 경우 curl 에 인증서 옵션 추가:
@@ -127,16 +127,18 @@ curl --cacert certs/ca-cert.pem \
 
 ## 5. 시드 계좌
 
-| 은행 | 계좌번호 | 예금주 | 통화 | 잔액 | 용도 |
-| --- | --- | --- | --- | --- | --- |
-| SHINHAN | 110-234-567890 | WIN MAUNG | KRW | 5,000,000 | 한국→해외 충전 재원 |
-| WOORI | 1002-345-678901 | NGUYEN VAN A | KRW | 3,200,000 | 한국→해외 충전 재원 |
-| KB | 404-21-987654 | JUAN DELA CRUZ | KRW | 150,000 | 잔액부족 시연용 |
-| QUOKKA | VN-9001-4455 | TRAN THI GIA DINH | VND | 0 | 베트남 수취 (현금화 대상) |
-| QUOKKA | PH-7700-1234 | MARIA SANTOS | PHP | 0 | 필리핀 수취 |
-| QUOKKA | US-3300-8899 | DAVID KIM | USD | 0 | 미국 수취 |
-| QUOKKA | VN-2200-0011 | LE VAN B | VND | 50,000,000 | 해외→한국 충전 재원(역방향) |
-| BEAVER | BV-1000-7788 | KIM CHEOL SU | KRW | 0 | 해외→한국 수취(역방향) |
+`bank_code` 는 금융결제원 표준 숫자 3자리. `004` KB국민 / `088` 신한 / `020` 우리 / `900` Beaver(시뮬레이션) / `901` Quokka(시뮬레이션). 본체(`com.gb.wallet`)의 `banks.code` 와 동일 표기이므로 이 표가 SSOT입니다. 계좌번호는 하이픈 없는 숫자/문자 시퀀스.
+
+| bank_code | 은행 | 계좌번호 | 예금주 | 통화 | 잔액 | 용도 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 088 | 신한 | 110234567890 | WIN MAUNG | KRW | 5,000,000 | 한국→해외 충전 재원 |
+| 020 | 우리 | 1002345678901 | NGUYEN VAN A | KRW | 3,200,000 | 한국→해외 충전 재원 |
+| 004 | KB국민 | 40421987654 | JUAN DELA CRUZ | KRW | 150,000 | 잔액부족 시연용 |
+| 901 | Quokka | VN90014455 | TRAN THI GIA DINH | VND | 0 | 베트남 수취 (현금화 대상) |
+| 901 | Quokka | PH77001234 | MARIA SANTOS | PHP | 0 | 필리핀 수취 |
+| 901 | Quokka | US33008899 | DAVID KIM | USD | 0 | 미국 수취 |
+| 901 | Quokka | VN22000011 | LE VAN B | VND | 50,000,000 | 해외→한국 충전 재원(역방향) |
+| 900 | Beaver | BV10007788 | KIM CHEOL SU | KRW | 0 | 해외→한국 수취(역방향) |
 
 ---
 
@@ -155,7 +157,7 @@ curl --cacert certs/ca-cert.pem \
 
 ④ 고객2가 본국 Quokka 계좌로 현금화
    → 본체: 주머니 VND 소멸
-   → 은행 서버: VN-9001 계좌 0 → 1825만 VND  (④ 지급)  ★ 잔액 늘어남
+   → 은행 서버: VN90014455 계좌 0 → 1825만 VND  (④ 지급)  ★ 잔액 늘어남
 
 "역방향(베트남→한국)도 동일한 출금/지급 구조로 동작합니다."
 ```

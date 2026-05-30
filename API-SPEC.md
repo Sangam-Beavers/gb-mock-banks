@@ -37,11 +37,15 @@
 
 ## 1. 은행 배역 (시드 기준)
 
+`bank_code` 는 금융결제원 표준 숫자 3자리 문자열. 본체(`com.gb.wallet`)의 `banks.code` 가 SSOT이며, 본체 wire(`MockBankClient`)가 그대로 실어 보낸다. 알파벳 enum(예전 `SHINHAN`/`KB`/`QUOKKA`)은 더 이상 받지 않는다.
+
 | 은행 코드 | 이름 | 역할 | 취급 통화 |
 | --- | --- | --- | --- |
-| `BEAVER` | Beaver Bank | 한국 PG + 한국 계좌 출금/지급 | KRW |
-| `QUOKKA` | Quokka Bank | 해외 파트너 은행 통합 (베트남/필리핀/미국) | USD / PHP / VND |
-| `SHINHAN` / `WOORI` / `KB` | 신한·우리·국민 | 한국 타행 (충전 재원 계좌가 위치) | KRW |
+| `004` | KB국민은행 | 한국 타행 (충전 재원 계좌가 위치) | KRW |
+| `088` | 신한은행 | 한국 타행 (충전 재원 계좌가 위치) | KRW |
+| `020` | 우리은행 | 한국 타행 (충전 재원 계좌가 위치) | KRW |
+| `900` | Beaver Bank | 한국 PG + 한국 계좌 출금/지급 (시뮬레이션 코드) | KRW |
+| `901` | Quokka Bank | 해외 파트너 은행 통합 — 베트남/필리핀/미국 (시뮬레이션 코드) | USD / PHP / VND |
 
 > 지원 통화는 본체 정책과 동일하게 **KRW / USD / PHP / VND** 4개로 고정. (본체 [`project-overview.md`](../project-overview.md) §2)
 > 돈의 흐름은 **양방향** 지원(한국→해외 / 해외→한국). 단, 본체에서 어느 방향을 노출하는지는 본체 기획 소관이며, 은행 서버는 양방향 호출을 모두 받는다.
@@ -104,8 +108,8 @@
 **Request Body**
 | 필드 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- |
-| `bank_code` | string | O | 은행 코드 (SHINHAN/WOORI/KB/BEAVER/QUOKKA) |
-| `account_number` | string | O | 계좌번호 |
+| `bank_code` | string | O | 은행 코드 — 금융결제원 숫자 3자리(004/088/020/900/901). §1 표 참고 |
+| `account_number` | string | O | 계좌번호 (하이픈 없는 문자열) |
 
 **Response 200** — `data`
 | 필드 | 타입 | nullable | 설명 |
@@ -213,8 +217,8 @@
 **Request Body**
 | 필드 | 타입 | 필수 | 설명 |
 | --- | --- | --- | --- |
-| `bank_code` | string | O | 수취 은행 코드 (BEAVER=한국 / QUOKKA=해외) |
-| `account_number` | string | O | 수취 계좌번호 |
+| `bank_code` | string | O | 수취 은행 코드 — 숫자 3자리 (`900` Beaver=한국 / `901` Quokka=해외) |
+| `account_number` | string | O | 수취 계좌번호 (하이픈 없는 문자열) |
 | `amount` | string | O | 지급 금액 (이미 환전된 최종 외화 금액) |
 | `currency_code` | string | O | 지급 통화. 수취 계좌 통화와 일치해야 함 |
 

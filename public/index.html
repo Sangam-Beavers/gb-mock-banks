@@ -88,11 +88,11 @@
   .ccy.USD { background: var(--ccy-usd-bg); color: var(--usd); }
 
   .bank { font-weight: 600; }
-  .bank.SHINHAN { color: var(--krw); }
-  .bank.WOORI   { color: var(--krw); }
-  .bank.KB      { color: var(--vnd); }
-  .bank.QUOKKA  { color: var(--vnd); }
-  .bank.BEAVER  { color: var(--usd); }
+  .bank-shinhan { color: var(--krw); }
+  .bank-woori   { color: var(--krw); }
+  .bank-kb      { color: var(--vnd); }
+  .bank-quokka  { color: var(--vnd); }
+  .bank-beaver  { color: var(--usd); }
 
   code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; }
 
@@ -232,6 +232,16 @@ function fmtMoney(s, currency) {
 }
 function rowKey(acc) { return acc.bank_code + '|' + acc.account_number; }
 
+// 금융결제원 표준 숫자 코드(서버 SSOT) → 시각용 슬러그(CSS 클래스 이름)
+// 숫자로 시작하는 클래스명은 CSS 셀렉터로 못 쓰므로 슬러그를 거쳐 칠한다.
+const BANK_SLUG = {
+  '004': 'kb',
+  '088': 'shinhan',
+  '020': 'woori',
+  '900': 'beaver',
+  '901': 'quokka',
+};
+
 async function call(method, path, body, extraHeaders) {
   const t0 = performance.now();
   const headers = { 'Content-Type': 'application/json', ...(extraHeaders || {}) };
@@ -291,10 +301,11 @@ function renderAccounts(accounts) {
     if (flash) tr.classList.add('flash');
     prevBalances.set(key, acc.balance);
 
-    const isQuokka = acc.bank_code === 'QUOKKA' || acc.bank_code === 'BEAVER';
+    const isQuokka = acc.bank_code === '901' || acc.bank_code === '900';
+    const slug = BANK_SLUG[acc.bank_code] || '';
 
     tr.innerHTML = `
-      <td><span class="bank ${acc.bank_code}">${acc.bank_code}</span></td>
+      <td><span class="bank bank-${slug}">${acc.bank_code}</span></td>
       <td><code>${acc.account_number}</code></td>
       <td>${acc.holder_name}</td>
       <td><span class="ccy ${acc.currency_code}">${acc.currency_code}</span></td>
