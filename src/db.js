@@ -3,13 +3,11 @@
 /**
  * 외부 은행 장부 DB (SQLite).
  *
- * 이 DB는 "외부 은행"의 것이다. GlobalBridge 본체의 MySQL(wallet_balances)과
- * 완전히 분리되어 있으며, 본체는 이 DB를 직접 만지지 않는다.
- *
  * 테이블:
- *   bank_accounts      외부 계좌와 잔액 (충전 재원 / 송금 수취 대상)
- *   account_tokens     계좌 인증(②) 시 발급한 토큰 → 출금(③)에서 계좌 지칭
- *   bank_transactions  출금/지급 거래 원장 + 멱등성 키(UNIQUE)
+ *   bank_accounts          외부 계좌와 잔액
+ *   account_tokens         계좌 인증 confirm 시 발급한 토큰
+ *   bank_transactions      출금/지급/인증입금 거래 원장
+ *   pending_verifications  1원 소액이체 인증 세션
  */
 
 const path = require('path');
@@ -26,50 +24,63 @@ function getDb(dbPath) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
   db = new Database(resolved);
-  db.pragma('journal_mode = WAL');   // 동시 읽기 안정성
+  db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   initSchema(db);
   return db;
 }
 
 function initSchema(d) {
-  d.exec(`
-    CREATE TABLE IF NOT EXISTS bank_accounts (
-      id              INTEGER PRIMARY KEY AUTOINCREMENT,
-      bank_code       TEXT    NOT NULL,
-      account_number  TEXT    NOT NULL,
-      holder_name     TEXT    NOT NULL,
-      currency_code   TEXT    NOT NULL,         -- KRW/USD/PHP/VND
-      balance         TEXT    NOT NULL DEFAULT '0.0000',  -- string 십진수 (DECIMAL 의미)
-      account_status  TEXT    NOT NULL DEFAULT 'ACTIVE',   -- ACTIVE/INACTIVE
-      created_at      TEXT    NOT NULL,
-      updated_at      TEXT    NOT NULL,
-      UNIQUE (bank_code, account_number)
-    );
+  const sql = [
+    'CREATE TABLE IF NOT EXISTS bank_accounts (',
+    '  id              INTEGER PRIMARY KEY AUTOINCREMENT,',
+    '  bank_code       TEXT    NOT NULL,',
+    '  account_number  TEXT    NOT NULL,',
+    '  holder_name     TEXT    NOT NULL,',
+    '  currency_code   TEXT    NOT NULL,',
+    "  balance         TEXT    NOT NULL DEFAULT '0.0000',",
+    "  account_status  TEXT    NOT NULL DEFAULT 'ACTIVE',",
+    '  created_at      TEXT    NOT NULL,',
+    '  updated_at      TEXT    NOT NULL,',
+    '  UNIQUE (bank_code, account_number)',
+    ');',
+    '',
+    'CREATE TABLE IF NOT EXISTS account_tokens (',
+    '  id              INTEGER PRIMARY KEY AUTOINCREMENT,',
+    '  account_token   TEXT    NOT NULL UNIQUE,',
+    '  account_id      INTEGER NOT NULL,',
+    '  created_at      TEXT    NOT NULL,',
+    '  FOREIGN KEY (account_id) REFERENCES bank_accounts(id)',
+    ');',
+    '',
+    'CREATE TABLE IF NOT EXISTS bank_transactions (',
+    '  id               INTEGER PRIMARY KEY AUTOINCREMENT,',
+    '  bank_tx_id       TEXT    NOT NULL UNIQUE,',
+    '  idempotency_key  TEXT    UNIQUE,',
+    "  kind             TEXT    NOT NULL,",
+    '  account_id       INTEGER NOT NULL,',
+    '  amount           TEXT    NOT NULL,',
+    '  currency_code    TEXT    NOT NULL,',
+    '  balance_after    TEXT    NOT NULL,',
+    '  status           TEXT    NOT NULL,',
+    '  memo             TEXT,',
+    '  response_json    TEXT    NOT NULL,',
+    '  created_at       TEXT    NOT NULL,',
+    '  FOREIGN KEY (account_id) REFERENCES bank_accounts(id)',
+    ');',
+    '',
+    'CREATE TABLE IF NOT EXISTS pending_verifications (',
+    '  id          INTEGER PRIMARY KEY AUTOINCREMENT,',
+    '  account_id  INTEGER NOT NULL,',
+    '  code        TEXT    NOT NULL,',
+    '  expires_at  TEXT    NOT NULL,',
+    '  used_at     TEXT,',
+    '  created_at  TEXT    NOT NULL,',
+    '  FOREIGN KEY (account_id) REFERENCES bank_accounts(id)',
+    ');',
+  ].join('\n');
 
-    CREATE TABLE IF NOT EXISTS account_tokens (
-      id              INTEGER PRIMARY KEY AUTOINCREMENT,
-      account_token   TEXT    NOT NULL UNIQUE,  -- UUID
-      account_id      INTEGER NOT NULL,
-      created_at      TEXT    NOT NULL,
-      FOREIGN KEY (account_id) REFERENCES bank_accounts(id)
-    );
-
-    CREATE TABLE IF NOT EXISTS bank_transactions (
-      id               INTEGER PRIMARY KEY AUTOINCREMENT,
-      bank_tx_id       TEXT    NOT NULL UNIQUE, -- UUID (대외 식별자)
-      idempotency_key  TEXT    UNIQUE,          -- 멱등성. 같은 키면 첫 결과 재반환
-      kind             TEXT    NOT NULL,        -- WITHDRAWAL / PAYOUT
-      account_id       INTEGER NOT NULL,
-      amount           TEXT    NOT NULL,        -- string 십진수
-      currency_code    TEXT    NOT NULL,
-      balance_after    TEXT    NOT NULL,        -- 거래 후 외부 계좌 잔액
-      status           TEXT    NOT NULL,        -- COMPLETED
-      response_json    TEXT    NOT NULL,        -- 멱등 재반환용 응답 캐시
-      created_at       TEXT    NOT NULL,
-      FOREIGN KEY (account_id) REFERENCES bank_accounts(id)
-    );
-  `);
+  d.exec(sql);
 }
 
 function closeDb() {

@@ -1,69 +1,229 @@
 {
-  "_comment": "Mock 은행 시드 데이터. npm run seed 로 SQLite(bank.db)에 투입된다. npm run reset 으로 초기화 후 재투입. 금액은 string 십진수(소수 4자리). 지원 통화 = KRW/USD/PHP/VND. bank_code 는 금융결제원 표준 숫자 3자리(004 KB / 088 신한 / 020 우리 / 900 Beaver / 901 Quokka).",
+  "_comment": "Mock 은행 시드 데이터. npm run seed 로 SQLite(bank.db)에 투입. npm run reset 으로 초기화 후 재투입. 금액은 string 십진수(소수 4자리). 지원 통화 = KRW/USD/PHP/VND. 해외 은행 코드는 SWIFT/BIC 약어 기반 내부 식별자.",
   "accounts": [
     {
       "bank_code": "088",
-      "account_number": "110234567890",
+      "account_number": "110-456-789012",
       "holder_name": "WIN MAUNG",
       "currency_code": "KRW",
-      "balance": "5000000.0000",
-      "note": "[한국→해외] 한국 거주 사용자의 충전 재원 계좌. 여기서 출금해 주머니로 충전."
+      "balance": "5200000.0000",
+      "note": "미얀마 출신 근로자. 신한은행 KRW 계좌. 충전 재원."
     },
     {
       "bank_code": "020",
-      "account_number": "1002345678901",
-      "holder_name": "NGUYEN VAN A",
+      "account_number": "1002-987-654321",
+      "holder_name": "NGUYEN VAN AN",
       "currency_code": "KRW",
-      "balance": "3200000.0000",
-      "note": "[한국→해외] 또 다른 충전 재원 계좌."
+      "balance": "3800000.0000",
+      "note": "베트남 출신 근로자. 우리은행 KRW 계좌."
     },
     {
       "bank_code": "004",
-      "account_number": "40421987654",
-      "holder_name": "JUAN DELA CRUZ",
+      "account_number": "404219-04-123456",
+      "holder_name": "JUAN MIGUEL DELA CRUZ",
       "currency_code": "KRW",
-      "balance": "150000.0000",
-      "note": "[한국→해외] 잔액 적은 계좌 — 충전 시 잔액부족(BANK4002) 시연용."
+      "balance": "1500000.0000",
+      "note": "필리핀 출신 근로자. KB국민은행."
     },
     {
-      "bank_code": "901",
-      "account_number": "VN90014455",
-      "holder_name": "TRAN THI GIA DINH",
-      "currency_code": "VND",
-      "balance": "0.0000",
-      "note": "[한국→해외] 베트남 본국 가족 수취 계좌. 현금화(지급) 대상."
+      "bank_code": "081",
+      "account_number": "181-910000-12345",
+      "holder_name": "SAMUEL KWAME ASANTE",
+      "currency_code": "KRW",
+      "balance": "2900000.0000",
+      "note": "가나 출신 근로자. 하나은행."
     },
     {
-      "bank_code": "901",
-      "account_number": "PH77001234",
-      "holder_name": "MARIA SANTOS",
-      "currency_code": "PHP",
-      "balance": "0.0000",
-      "note": "[한국→해외] 필리핀 본국 수취 계좌."
+      "bank_code": "011",
+      "account_number": "356-0079-5432-11",
+      "holder_name": "PEDRO JOSE SANTOS",
+      "currency_code": "KRW",
+      "balance": "980000.0000",
+      "note": "필리핀 출신 근로자. 농협은행. 잔액 적은 계좌."
     },
     {
-      "bank_code": "901",
-      "account_number": "US33008899",
-      "holder_name": "DAVID KIM",
-      "currency_code": "USD",
-      "balance": "0.0000",
-      "note": "[한국→해외] 미국 수취 계좌."
+      "bank_code": "088",
+      "account_number": "110-342-001234",
+      "holder_name": "TRAN THI BICH NGOC",
+      "currency_code": "KRW",
+      "balance": "6100000.0000",
+      "note": "베트남 출신 근로자. 신한은행."
     },
     {
-      "bank_code": "901",
-      "account_number": "VN22000011",
-      "holder_name": "LE VAN B",
-      "currency_code": "VND",
-      "balance": "50000000.0000",
-      "note": "[해외→한국] 베트남 사용자의 충전 재원 계좌(VND 보유). 역방향 송금 시 여기서 출금."
+      "bank_code": "004",
+      "account_number": "404321-04-888001",
+      "holder_name": "FATIMAH BINTE HASSAN",
+      "currency_code": "KRW",
+      "balance": "4400000.0000",
+      "note": "인도네시아 출신 근로자. KB국민은행."
     },
     {
-      "bank_code": "900",
-      "account_number": "BV10007788",
+      "bank_code": "020",
+      "account_number": "1003-271-000099",
+      "holder_name": "RAJAN KUMAR SINGH",
+      "currency_code": "KRW",
+      "balance": "2100000.0000",
+      "note": "인도 출신 근로자. 우리은행."
+    },
+    {
+      "bank_code": "081",
+      "account_number": "181-910002-54321",
+      "holder_name": "ALIJON YUSUPOV",
+      "currency_code": "KRW",
+      "balance": "3500000.0000",
+      "note": "우즈베키스탄 출신 근로자. 하나은행."
+    },
+    {
+      "bank_code": "088",
+      "account_number": "110-781-654321",
       "holder_name": "KIM CHEOL SU",
       "currency_code": "KRW",
       "balance": "0.0000",
-      "note": "[해외→한국] 한국 수취 계좌. 역방향(해외→한국) 현금화(지급) 대상."
+      "note": "한국인 수취 계좌. 역방향(해외→한국) 지급 대상."
+    },
+    {
+      "bank_code": "081",
+      "account_number": "181-910011-11111",
+      "holder_name": "LEE YOUNG HEE",
+      "currency_code": "KRW",
+      "balance": "0.0000",
+      "note": "한국인 수취 계좌. 역방향(해외→한국) 지급 대상."
+    },
+    {
+      "bank_code": "011",
+      "account_number": "356-0001-1234-56",
+      "holder_name": "PARK JI HO",
+      "currency_code": "KRW",
+      "balance": "0.0000",
+      "note": "한국인 수취 계좌."
+    },
+    {
+      "bank_code": "WF",
+      "account_number": "8042531987",
+      "holder_name": "DAVID H KIM",
+      "currency_code": "USD",
+      "balance": "3200.0000",
+      "note": "재미교포. Wells Fargo USD 계좌. 충전 재원."
+    },
+    {
+      "bank_code": "BOA",
+      "account_number": "3254001782",
+      "holder_name": "JENNIFER THI NGUYEN",
+      "currency_code": "USD",
+      "balance": "1850.0000",
+      "note": "베트남계 미국인. Bank of America. 충전 재원."
+    },
+    {
+      "bank_code": "JPM",
+      "account_number": "7703219450",
+      "holder_name": "MICHAEL SANTOS",
+      "currency_code": "USD",
+      "balance": "5400.0000",
+      "note": "필리핀계 미국인. Chase(JPMorgan)."
+    },
+    {
+      "bank_code": "C",
+      "account_number": "4481920374",
+      "holder_name": "SARAH ELIZABETH JOHNSON",
+      "currency_code": "USD",
+      "balance": "0.0000",
+      "note": "미국인. Citibank. 수취 전용."
+    },
+    {
+      "bank_code": "WF",
+      "account_number": "9917263001",
+      "holder_name": "GRACE PARK",
+      "currency_code": "USD",
+      "balance": "0.0000",
+      "note": "재미교포 수취 계좌. Wells Fargo."
+    },
+    {
+      "bank_code": "VCB",
+      "account_number": "0011004321001",
+      "holder_name": "TRAN THI BICH",
+      "currency_code": "VND",
+      "balance": "12000000.0000",
+      "note": "NGUYEN VAN AN의 어머니. Vietcombank VND 수취 계좌."
+    },
+    {
+      "bank_code": "BIDV",
+      "account_number": "31410002376801",
+      "holder_name": "LE VAN THANH",
+      "currency_code": "VND",
+      "balance": "8500000.0000",
+      "note": "베트남 수취인. BIDV."
+    },
+    {
+      "bank_code": "ICB",
+      "account_number": "1030017400123",
+      "holder_name": "PHAM VAN HUNG",
+      "currency_code": "VND",
+      "balance": "0.0000",
+      "note": "VietinBank(ICB). 수취 전용."
+    },
+    {
+      "bank_code": "TCB",
+      "account_number": "1900-1234-5678",
+      "holder_name": "NGUYEN THI LAN",
+      "currency_code": "VND",
+      "balance": "55000000.0000",
+      "note": "Techcombank. 충전 재원(VND 역방향)."
+    },
+    {
+      "bank_code": "VCB",
+      "account_number": "0071001987654",
+      "holder_name": "HO THI MAI",
+      "currency_code": "VND",
+      "balance": "0.0000",
+      "note": "Vietcombank VND 수취."
+    },
+    {
+      "bank_code": "BIDV",
+      "account_number": "31410009988001",
+      "holder_name": "TRUONG QUOC BAO",
+      "currency_code": "VND",
+      "balance": "0.0000",
+      "note": "BIDV VND 수취."
+    },
+    {
+      "bank_code": "BDO",
+      "account_number": "006-380-041234",
+      "holder_name": "MARIA LUISA C SANTOS",
+      "currency_code": "PHP",
+      "balance": "45000.0000",
+      "note": "JUAN DELA CRUZ의 누나. BDO PHP 수취."
+    },
+    {
+      "bank_code": "BPI",
+      "account_number": "2139-0041-52",
+      "holder_name": "JOSE FERNANDEZ REYES",
+      "currency_code": "PHP",
+      "balance": "120000.0000",
+      "note": "BPI. 충전 재원(PHP 역방향)."
+    },
+    {
+      "bank_code": "MBT",
+      "account_number": "055-7-005432109",
+      "holder_name": "ANA MARIE GARCIA",
+      "currency_code": "PHP",
+      "balance": "0.0000",
+      "note": "Metrobank. 수취 전용."
+    },
+    {
+      "bank_code": "UBP",
+      "account_number": "109-201234567",
+      "holder_name": "EDGAR DELA PEÑA",
+      "currency_code": "PHP",
+      "balance": "0.0000",
+      "note": "UnionBank. 수취 전용."
+    },
+    {
+      "bank_code": "BDO",
+      "account_number": "006-710-099001",
+      "holder_name": "ROSARIO MENDOZA CRUZ",
+      "currency_code": "PHP",
+      "balance": "89000.0000",
+      "note": "BDO. 충전 재원(PHP)."
     }
   ]
 }

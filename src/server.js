@@ -28,6 +28,7 @@ const TLS_ENABLED = String(process.env.TLS_ENABLED || 'false').toLowerCase() ===
 const ROUTES = {
   'POST /api/v1/bank/accounts/inquiry':       (b)    => routes.inquiry(b),
   'POST /api/v1/bank/accounts/verify':        (b)    => routes.verify(b),
+  'POST /api/v1/bank/accounts/confirm':       (b)    => routes.confirm(b),
   'POST /api/v1/bank/transfers/withdrawal':   (b, h) => routes.withdrawal(b, h),
   'POST /api/v1/bank/transfers/payout':       (b, h) => routes.payout(b, h),
 };
@@ -55,6 +56,32 @@ async function handler(req, res) {
     try {
       return sendJson(res, 200, routes.listAccounts());
     } catch (err) {
+      console.error('[UNHANDLED]', err);
+      return sendJson(res, 500, fail('BANK5000', '은행 서버 내부 오류입니다.'));
+    }
+  }
+
+  // (UI 전용) 미사용·미만료 인증 대기 목록 — 목 은행 UI에서 코드 확인용
+  if (method === 'GET' && url === '/admin/pending-verifications') {
+    try {
+      return sendJson(res, 200, routes.listPendingVerifications());
+    } catch (err) {
+      console.error('[UNHANDLED]', err);
+      return sendJson(res, 500, fail('BANK5000', '은행 서버 내부 오류입니다.'));
+    }
+  }
+
+  // (UI 전용) 계좌별 최근 거래 내역 — GET /admin/transactions?bankCode=088&accountNumber=1234
+  if (method === 'GET' && url.startsWith('/admin/transactions')) {
+    try {
+      const qs = new URLSearchParams((req.url || '').split('?')[1] || '');
+      const bankCode = qs.get('bankCode') || '';
+      const accountNumber = qs.get('accountNumber') || '';
+      return sendJson(res, 200, routes.listAccountTransactions(bankCode, accountNumber));
+    } catch (err) {
+      if (err instanceof BankError) {
+        return sendJson(res, err.http, fail(err.code, err.message));
+      }
       console.error('[UNHANDLED]', err);
       return sendJson(res, 500, fail('BANK5000', '은행 서버 내부 오류입니다.'));
     }
