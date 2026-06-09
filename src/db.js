@@ -27,6 +27,7 @@ function getDb(dbPath) {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   initSchema(db);
+  migrateSchema(db);
   return db;
 }
 
@@ -81,6 +82,35 @@ function initSchema(d) {
   ].join('\n');
 
   d.exec(sql);
+}
+
+/**
+ * 구버전 DB 스키마를 현재 버전으로 자동 마이그레이션.
+ * ALTER TABLE ADD COLUMN은 컬럼이 없을 때만 실행 — 멱등(idempotent).
+ *
+ * 추가된 컬럼:
+ *   bank_transactions.balance_after  — 거래 후 잔액 (1원 인증입금 시 필요)
+ *   bank_transactions.memo           — 입금 적요 (인증번호 기재용)
+ *   bank_transactions.response_json  — 원본 응답 JSON 보관
+ */
+function migrateSchema(d) {
+  const existingCols = d
+    .prepare('PRAGMA table_info(bank_transactions)')
+    .all()
+    .map((r) => r.name);
+
+  if (!existingCols.includes('balance_after')) {
+    d.exec("ALTER TABLE bank_transactions ADD COLUMN balance_after TEXT NOT NULL DEFAULT '0.0000'");
+    console.log('[db] migration: bank_transactions.balance_after 추가');
+  }
+  if (!existingCols.includes('memo')) {
+    d.exec('ALTER TABLE bank_transactions ADD COLUMN memo TEXT');
+    console.log('[db] migration: bank_transactions.memo 추가');
+  }
+  if (!existingCols.includes('response_json')) {
+    d.exec("ALTER TABLE bank_transactions ADD COLUMN response_json TEXT NOT NULL DEFAULT '{}'");
+    console.log('[db] migration: bank_transactions.response_json 추가');
+  }
 }
 
 function closeDb() {
